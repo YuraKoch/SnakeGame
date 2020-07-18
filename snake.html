@@ -27,18 +27,16 @@
 <canvas width="600" height="600">HTML 5 не поддерживется</canvas>
  
 <script type="application/javascript">
-  let canvas = document.querySelector("canvas"),
-      ctx = canvas.getContext("2d"),
-      cellSize = 25, //Размер элемента змейки
-      positionX = canvas.width/2 - cellSize, positionY = canvas.height/2 - cellSize, //Координаты позиции змейки, со стартовой позицией
-      dx = 0, dy = 0, //Направление (вектор) движения змейки
-      xZarr = [], yZarr = [], //Массивы координат змейки
-      snakeArr = [{x: positionX, y: positionY}],
-      fruit, //Объект с координатами позиции фрукта
-      snakeLength = 1; //Длина змеи. По умолчанию 1.
-  
-  // canvas.width = document.body.clientWidth;
-  // canvas.height = document.body.clientHeight;
+  const canvas = document.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+  const cellSize = 25;
+  let positionX = canvas.width/2 - cellSize;
+  let positionY = canvas.height/2 - cellSize;
+  let dx = 0, dy = 0; //Направление (вектор) движения змейки
+  let xZarr = [], yZarr = []; //Массивы координат змейки
+  const snakeArr = [{x: positionX, y: positionY}];
+  let fruit; //Объект с координатами позиции фрукта
+  let snakeLength = 1; //Длина змеи. По умолчанию 1.
   
 
   //Функция случайного выбора координат c учетом ширины клетки
@@ -58,15 +56,6 @@
   }
   
   fruit = createFruit(); //Вызываем функцию для расчета случайной стартовой позиции фрукта
-
-  //Функция обнуления змейки при столкновении с хвостом
-  // function feil() {
-  //     ctx.fillStyle="White"; //Вспышка при столкновении
-  //     ctx.fillRect(0, 0, canvas.width, canvas.height);
-  //     xZarr.length=1; //Стираем X-массив змейки до 1 элемента
-  //     yZarr.length=1; //Стираем Y-массив змейки до 1 элемента
-  //     snakeLength=0; //Обнуляем счетчик
-  // };
   
   //Отслеживаем нажатие клавиш в потоке событий
   const   KEY_LEFT  = 37,
@@ -76,10 +65,10 @@
 
   document.addEventListener('keydown',function(event) {
       event.preventDefault(); //Отменяются исполнения браузером событий event, что-бы не срабатывал скролл(прокрутка) страниц, при нажатии стрелок
-      if      (event.keyCode == KEY_LEFT  && dx == 0) {dx=-1; dy=0;} //Влево
-      else if (event.keyCode == KEY_UP    && dy == 0) {dx=0; dy=-1;} //Вверх
-      else if (event.keyCode == KEY_RIGHT && dx == 0) {dx=1; dy=0;} //Вправо
-      else if (event.keyCode == KEY_DOWN  && dy == 0) {dx=0; dy=1;} //Вниз
+      if      (event.keyCode == KEY_LEFT  && dx == 0) {dx =-1; dy =0;} //Влево
+      else if (event.keyCode == KEY_UP    && dy == 0) {dx =0; dy =-1;} //Вверх
+      else if (event.keyCode == KEY_RIGHT && dx == 0) {dx =1; dy =0;} //Вправо
+      else if (event.keyCode == KEY_DOWN  && dy == 0) {dx =0; dy =1;} //Вниз
   });
   
   //Функция отрисовки кадра через интервал времени
@@ -121,7 +110,7 @@
           snakeArr.pop();
       }
       
-  }, 1000/15); //Пауза (кадров в секунду)
+  }, 1000/10); //Пауза (кадров в секунду)
 </script>
 </body>
 </html>
