@@ -27,57 +27,69 @@
 <canvas width="600" height="600">HTML 5 не поддерживется</canvas>
  
 <script type="application/javascript">
-  const canvas = document.querySelector("canvas");
-  const ctx = canvas.getContext("2d");
-  const cellSize = 25;
-  let positionX = canvas.width/2 - cellSize;
-  let positionY = canvas.height/2 - cellSize;
-  let dx = 0, dy = 0; //Направление (вектор) движения змейки
-  let xZarr = [], yZarr = []; //Массивы координат змейки
-  const snakeArr = [{x: positionX, y: positionY}];
-  let fruit; //Объект с координатами позиции фрукта
-  let snakeLength = 1; //Длина змеи. По умолчанию 1.
-  
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+const cellSize = 25;
+let positionX = canvas.width/2 - cellSize;
+let positionY = canvas.height/2 - cellSize;
+let dx = 0, dy = 0; //Направление (вектор) движения змейки
+let xZarr = [], yZarr = []; //Массивы координат змейки
+const snakeArr = [{x: positionX, y: positionY}];
+let fruit; //Объект с координатами позиции фрукта
+let snakeLength = 1; //Длина змеи. По умолчанию 1.
 
-  //Функция случайного выбора координат c учетом ширины клетки
-  function randomPosition(max, cell) {
-      return Math.floor(Math.random()*max/cell)*cell;
-  }
-  
-  //Функция случайного выбора координат для фрукта
-  function createFruit() {
-      let obj = {};
-      do {            
-          obj.x = randomPosition(canvas.width, cellSize);
-          obj.y = randomPosition(canvas.height, cellSize);
-      }
-      while (snakeArr.some(item => obj.x === item.x && obj.y === item.y))
-      return obj;
-  }
-  
-  fruit = createFruit(); //Вызываем функцию для расчета случайной стартовой позиции фрукта
-  
-  //Отслеживаем нажатие клавиш в потоке событий
-  const   KEY_LEFT  = 37,
-          KEY_UP    = 38,
-          KEY_RIGHT = 39,
-          KEY_DOWN  = 40;
 
-  document.addEventListener('keydown',function(event) {
-      event.preventDefault(); //Отменяются исполнения браузером событий event, что-бы не срабатывал скролл(прокрутка) страниц, при нажатии стрелок
-      if      (event.keyCode == KEY_LEFT  && dx == 0) {dx =-1; dy =0;} //Влево
-      else if (event.keyCode == KEY_UP    && dy == 0) {dx =0; dy =-1;} //Вверх
-      else if (event.keyCode == KEY_RIGHT && dx == 0) {dx =1; dy =0;} //Вправо
-      else if (event.keyCode == KEY_DOWN  && dy == 0) {dx =0; dy =1;} //Вниз
-  });
-  
-  //Функция отрисовки кадра через интервал времени
+//Функция случайного выбора координат c учетом ширины клетки
+function randomPosition(max, cell) {
+    return Math.floor(Math.random()*max/cell)*cell;
+}
+
+//Функция случайного выбора координат для фрукта
+function createFruit() {
+    let obj = {};
+    do {            
+        obj.x = randomPosition(canvas.width, cellSize);
+        obj.y = randomPosition(canvas.height, cellSize);
+    }
+    while (snakeArr.some(item => obj.x === item.x && obj.y === item.y))
+    return obj;
+}
+
+function drawFruit(img, x, y, width, height) {
+  ctx.drawImage(img, x, y, width, height);
+}
+
+fruit = createFruit(); //Вызываем функцию для расчета случайной стартовой позиции фрукта
+
+//Отслеживаем нажатие клавиш в потоке событий
+const   KEY_LEFT  = 37,
+        KEY_UP    = 38,
+        KEY_RIGHT = 39,
+        KEY_DOWN  = 40;
+
+document.addEventListener('keydown',function(event) {
+    event.preventDefault(); //Отменяются исполнения браузером событий event, что-бы не срабатывал скролл(прокрутка) страниц, при нажатии стрелок
+    if      (event.keyCode == KEY_LEFT  && dx == 0) {dx = -1; dy = 0;} //Влево
+    else if (event.keyCode == KEY_UP    && dy == 0) {dx = 0; dy = -1;} //Вверх
+    else if (event.keyCode == KEY_RIGHT && dx == 0) {dx = 1; dy = 0;} //Вправо
+    else if (event.keyCode == KEY_DOWN  && dy == 0) {dx = 0; dy = 1;} //Вниз
+});
+
+let appleImgPromise = new Promise(function(resolve, reject) {
+  let appleImg = new Image();
+  appleImg.src = "img/apple.svg";
+  appleImg.onload = function() {
+    resolve(appleImg);
+  }
+})
+
+function startGame(appleImg) {
+  console.log("startGame");
   setInterval(function() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      //Цвет и позиция фрукта
-      ctx.fillStyle="red";
-      ctx.fillRect(fruit.x+1, fruit.y+1, cellSize-2, cellSize-2);
+      //Позиция фрукта
+      drawFruit(appleImg, fruit.x+1, fruit.y+1, cellSize-2, cellSize-2);
       
       //Рассчитываем координаты при движении и телепортируем при выходе за края
       positionX += dx*cellSize;
@@ -88,21 +100,17 @@
       if (positionY >= canvas.height) positionY = 0;
       if (positionY < 0) positionY = canvas.height-cellSize;
       
-      //Проверка на столкновение
-      // for (let i=0; i<=(snakeLength); i++) if (xZarr[i]==positionX && yZarr[i]==positionY) feil();
-      
       //Добавляем координаты в начальный элемент массива
-      snakeArr.unshift({x:positionX, y:positionY});
-      console.log(snakeArr.length);
+      snakeArr.unshift({x: positionX, y: positionY});
       
       //Цикл вывода элементов змейки с отрисовкой
-      ctx.fillStyle="lime";
+      ctx.fillStyle="green";
       for (let i=0; i < snakeLength; i++) {
           ctx.fillRect(snakeArr[i].x+1, snakeArr[i].y+1, cellSize-2, cellSize-2); //Отрисовка массива змейки
       }
       
       //Кушаем фрукт, при совпадении координат головы змеи и фрукта - выводим новый фрукт и счетчик +1
-      if (fruit.x == positionX && fruit.y == positionY) {
+      if (fruit.x === positionX && fruit.y === positionY) {
           snakeLength++;
           fruit = createFruit();
       } else {
@@ -111,6 +119,9 @@
       }
       
   }, 1000/10); //Пауза (кадров в секунду)
+}
+
+appleImgPromise.then(appleImg => startGame(appleImg));
 </script>
 </body>
 </html>
